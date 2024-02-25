@@ -8,12 +8,28 @@ FONT_NAME = "Courier"
 WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
+reps = 0
 
 # ---------------------------- TIMER RESET ------------------------------- # 
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
-    count_down(30*60)
+    global reps
+    reps += 1
+    work_sec = WORK_MIN * 60
+    short_break_sec = SHORT_BREAK_MIN * 60
+    long_break_sec = LONG_BREAK_MIN * 60
+    if reps % 8 == 0:
+        label.config(text='Long Break', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=RED)
+        count_down(long_break_sec)
+    elif reps % 2 == 0:
+        label.config(text='Short Break', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=PINK)
+        count_down(short_break_sec)
+    else:
+        label.config(text='Work Time', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=GREEN)
+        count_down(work_sec)
+
+
 # ---------------------------- COUNTDOWN MECHANISM ------------------------------- # 
 def count_down(count):
 
@@ -25,6 +41,9 @@ def count_down(count):
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
         window.after(1000, count_down, count - 1)
+    else:
+        start_timer()
+
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -52,8 +71,7 @@ reset_button = Button()
 reset_button.config(text='Reset', font=(FONT_NAME, 10), fg='Blue', width=5,  highlightthickness=0)
 
 # Create check mark
-check = Label()
-check.config(text='✔', font=(FONT_NAME, 10), fg=GREEN, bg=YELLOW)
+check = Label(fg=GREEN, bg=YELLOW)
 
 # Positions
 label.grid(column=1, row=0)
