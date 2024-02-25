@@ -1,4 +1,5 @@
 from tkinter import *
+import math
 # ---------------------------- CONSTANTS ------------------------------- #
 PINK = "#e2979c"
 RED = "#e7305b"
@@ -9,8 +10,16 @@ WORK_MIN = 25
 SHORT_BREAK_MIN = 5
 LONG_BREAK_MIN = 20
 reps = 0
+timer = None
 
 # ---------------------------- TIMER RESET ------------------------------- # 
+def reset_timer():
+    global reps
+    window.after_cancel(timer)
+    reps = 0
+    label.config(text='Timer', fg=GREEN)
+    canvas.itemconfig(timer_text, text="00:00")
+    check.config(text='')
 
 # ---------------------------- TIMER MECHANISM ------------------------------- # 
 def start_timer():
@@ -20,13 +29,13 @@ def start_timer():
     short_break_sec = SHORT_BREAK_MIN * 60
     long_break_sec = LONG_BREAK_MIN * 60
     if reps % 8 == 0:
-        label.config(text='Long Break', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=RED)
+        label.config(text='Break', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=RED)
         count_down(long_break_sec)
     elif reps % 2 == 0:
-        label.config(text='Short Break', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=PINK)
+        label.config(text='Break', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=PINK)
         count_down(short_break_sec)
     else:
-        label.config(text='Work Time', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=GREEN)
+        label.config(text='Work', font=(FONT_NAME, 35, 'italic'), bg=YELLOW, highlightthickness=0, fg=GREEN)
         count_down(work_sec)
 
 
@@ -40,9 +49,17 @@ def count_down(count):
 
     canvas.itemconfig(timer_text, text=f"{count_min}:{count_sec}")
     if count > 0:
-        window.after(1000, count_down, count - 1)
+         global timer
+         timer = window.after(1000, count_down, count - 1)
     else:
         start_timer()
+        marks = ''
+        work_sessions = math.floor(reps/2)
+        for _ in range (work_sessions):
+            marks += '✔'
+        check.config(text=marks)
+
+
 
 
 
@@ -68,7 +85,7 @@ start_button.config(text='Start', font=(FONT_NAME, 10), fg='Blue', width=5, high
 
 # Create button 'Reset
 reset_button = Button()
-reset_button.config(text='Reset', font=(FONT_NAME, 10), fg='Blue', width=5,  highlightthickness=0)
+reset_button.config(text='Reset', font=(FONT_NAME, 10), fg='Blue', width=5,  highlightthickness=0, command=reset_timer)
 
 # Create check mark
 check = Label(fg=GREEN, bg=YELLOW)
